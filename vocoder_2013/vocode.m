@@ -9,7 +9,11 @@ function [xOut, fsOut, p] = vocode(xIn, fsIn, params)
 %       analysis_filters.center
 %       analysis_filters.lower
 %       analysis_filters.upper
-%   Such structure can be produced by FILTER_BANDS.
+%   Such structure can be produced by FILTER_BANDS. The elements filterA
+%   and filterB are cell arrays containing the filter coefficients for each
+%   channel. If, for a given channel, a cell array is provided, the filters
+%   will be applied sequentially. Filters are applied with the FILTFILT
+%   function.
 %
 %   PARAMS can also contain a field 'synthesis_filters' of the same form.
 %   If no such field is provided, the content of 'analysis_filters' will be
@@ -25,6 +29,16 @@ function [xOut, fsOut, p] = vocode(xIn, fsIn, params)
 %       order   = the order of the filter, the actual order will be
 %                 multiplied by 4 (default is 2, hence filters of effective
 %                 order 8)
+%   The field 'modifiers' contains a list (cell-array) of
+%   function names (or handles) modifying the envelope. A cell array can
+%   also be provided to give arguments to the function. Possible values
+%   are:
+%       - 'threshold' (equivalent to {'threshold', 0.01}). This should
+%         always be applied first.
+%       - 'n-of-m' (equivalent to {'n-of-m', 8}, number of maxima)
+%       - or a function handle that takes in the envelope matrix, the
+%         sampling frequency, and extra arguments:
+%         FNC(M, FS, PARAMS, A, B, ...) should be called as {@FNC, A, B, ...}    
 %
 %   The field 'synth' describes how the resynthesis should be performed:
 %       carrier = 'noise' (default), 'sin', 'low-noise' or 'pshc'
@@ -40,7 +54,7 @@ function [xOut, fsOut, p] = vocode(xIn, fsIn, params)
 %   initialized using the field PARAMS.random_seed. By default this field
 %   contains sum(100*clock).
 %
-%   See also FILTER_BANDS, GET_LOWNOISE, GET_PSHC
+%   See also FILTER_BANDS, GET_LOWNOISE, GET_PSHC, FILTFILT
  
 
 % Etienne Gaudrain <etienne.gaudrain@mrc-cbu.cam.ac.uk> - 2010-02-17
@@ -63,7 +77,7 @@ fs = fsIn;
 % the RMS of the output corresponds to the RMS of this portion of the
 % spectrum of the input.
 
-[b, a] = butter(min(p.analysis_filters.order([1, end])), [p.analysis_filters.lower(1), p.analysis_filters.upper(end)]*2/fs);
+[b, a] = butter(ceil(min(p.analysis_filters.order([1, end]))), [p.analysis_filters.lower(1), p.analysis_filters.upper(end)]*2/fs);
 rmsOut = rms(filtfilt(b, a, xIn));
 
 %--------------------- Prepare the band filters
@@ -108,6 +122,7 @@ end
 
 nSmp = length(xIn);
 ModC = zeros(nSmp, nCh);
+Env  = zeros(nSmp, nCh);
 %{
 y    = zeros(nSmp, 1);
 env  = zeros(nSmp, 1);
@@ -121,8 +136,8 @@ levels = zeros(nCh, 1);
 %--------------------- Synthesize each channel
 
 for i=1:nCh
-    %y=filter(AF.filterB(i,:), AF.filterA(i,:),x)';
-    y = filtfilt(AF.filterB(i,:), AF.filterA(i,:), xIn);
+
+    y = apply_filter(AF, i, xIn);
     levels(i) = rms(y);
     
     switch p.envelope.method
@@ -144,15 +159,45 @@ for i=1:nCh
   
     end
     
-    env = env / max(env);
+    if isempty(p.envelope.modifiers) % We only do this if the envelope was unmodified
+        Env(:,i) = env / max(env);
+    else
+        Env(:,i) = env;
+    end
+end
 
+for km = 1:length(p.envelope.modifiers)
+    md = p.envelope.modifiers{km};
+    if iscell(md)
+        md_name = md{1};
+        md_args = md(2:end);
+    else
+        md_name = md;
+        md_args = {};
+    end
+    switch md_name
+        case 'threshold'
+            md_f = @envelope_mod_threshold;
+        case 'n-of-m'
+            md_f = @envelope_mod_nofm;
+        otherwise
+            if isa(md_name, 'function_handle')
+                md_f = md_name;
+            else
+                error('Envelope modifier "%s" is unknown.', md_name);
+            end
+    end
+    Env = md_f(Env, fs, p, md_args{:});
+end
+
+for i=1:nCh
     switch p.synth.carrier
         case 'noise'
             %-- Excite with noise
             rng(p.random_seed);
             nz = sign(rand(nSmp,1)-0.5);
             if p.synth.filter_before
-                nz = filtfilt(SF.filterB(i,:), SF.filterA(i,:), nz);
+                nz = apply_filter(SF, i, nz);
             end
             
         case {'sine', 'sin'}
@@ -168,14 +213,16 @@ for i=1:nCh
         
     end
     
-    ModC(:,i) = env .* nz;
+    ModC(:,i) = Env(:,i) .* nz;
     
     if p.synth.filter_after
-        ModC(:,i) = filtfilt(SF.filterB(i,:), SF.filterA(i,:), ModC(:,i));
+        ModC(:,i) = apply_filter(SF, i, ModC(:,i));
     end
     
     % Restore the RMS of the channel
-    ModC(:,i) = ModC(:,i) / rms(ModC(:,i)) * levels(i);
+    if isempty(p.envelope.modifiers) % We only do this if the envelope was unmodified
+        ModC(:,i) = ModC(:,i) / rms(ModC(:,i)) * levels(i);
+    end
 end
 
 %--------------------- Reconstruct
@@ -184,7 +231,6 @@ xOut = sum(ModC, 2);
 xOut = xOut / rms(xOut) * rmsOut;
 
 % CAREFUL: the output is not scaled to avoid clipping
-
 %{
 max_sample = max(abs(xOut));
 if max_sample > (2^15-2)/2^15
@@ -212,6 +258,7 @@ p.envelope.method = 'low-pass';
 p.envelope.rectify = 'half-wave';
 p.envelope.fc = 250;
 p.envelope.order = 2;
+p.envelope.modifiers = {};
 
 %-- Synthesis
 p.synth = struct();
@@ -255,4 +302,22 @@ for k = 1:length(keys)
         c.(key) = b.(key);
     end
     
+end
+
+
+%==========================================================================
+function y = apply_filter(filter_struct, i, x)
+% Filters X in channel I of FILTER_STRUCT
+
+if iscell(filter_struct.filterB{i})
+    % filterB/A is a collection of filters that need to be run after each
+    % other.
+    y = x;
+    b = filter_struct.filterB{i};
+    a = filter_struct.filterA{i};
+    for k=1:length(b)
+        y = filtfilt(b{k}, a{k}, y);
+    end
+else
+    y = filtfilt(filter_struct.filterB{i}, filter_struct.filterA{i}, x);
 end
