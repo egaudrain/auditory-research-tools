@@ -1,4 +1,4 @@
-function [notes durations] = parse_melody(str)
+function [notes, durations] = parse_melody(str)
 
 % PARSE_MELODY - Parses a melody string
 %   [notes durations] = parse_melody(str)
@@ -18,12 +18,12 @@ function [notes durations] = parse_melody(str)
 
 melody = explode(',',str);
 
-notes = {};
-durations = [];
+notes = cell(length(melody),1);
+durations = zeros(1,length(melody));
 
 for i=1:length(melody)
     note = explode(':',melody{i});
-    durations(i) = str2num(note{2});
+    durations(i) = str2double(note{2});
     notes{i} = strtrim(note{1});
 end
     

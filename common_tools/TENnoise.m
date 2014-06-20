@@ -5,7 +5,7 @@ function [x, fs] = TENnoise(d, fs)
 %   frequency fs. Intensity is set at 0 dB/ERBN. d is expressed in seconds.
 %
 %   Ref.:
-%     Moore, Huss, Vickers, Glasberg, Alcántara, (2000)
+%     Moore, Huss, Vickers, Glasberg, Alcantara, (2000)
 %         "A test for the diagnosis of dead regions in the cochlea."
 %         Br. J. Audiol. 34, 205-224.
 

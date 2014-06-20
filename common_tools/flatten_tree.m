@@ -1,7 +1,19 @@
 function str = flatten_tree(tree, basename, sep)
+%STR = FLATTEN_TREE(TREE)
+%   Transforms a struct-array into a long string.
+%
+%STR = FLATTEN_TREE(TREE, BASENAME)
+%   Adds the prefix BASENAME in from of field names. Default is ''.
+%
+%STR = FLATTEN_TREE(TREE, BASENAME, SEP)
+%   Uses SEP as a separator between entries. Default is '\n'.
+
+% E. Gaudrain <egaudrain@gmail.com> - 2014-06-20
+% University of Groningen - University Medical Center Groningen
+% Department of Otorhinolaryngology, Groningen, NL
 
 if nargin==1
-    basename = '';
+    %basename = '';
     basenamed = '';
 else
     basenamed = [basename '.'];
@@ -15,7 +27,6 @@ k = fieldnames(tree);
 
 str = '';
 for i=1:length(k)
-    %disp([basenamed k{i}])
     branch = tree.(k{i});
     if isstruct(branch)
         str = sprintf('%s%s%s%s', str, flatten_tree(branch, [basenamed k{i}]), sep);
@@ -31,7 +42,7 @@ function str = var2str(v)
 str = '';
 
 if isnumeric(v)
-    if prod(size(v))>1
+    if numel(v)>1
         str = '[';
         for i=1:size(v,1)
             for j=1:size(v,2)

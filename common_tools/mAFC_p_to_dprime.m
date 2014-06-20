@@ -1,6 +1,19 @@
 function dprime = mAFC_p_to_dprime(p, m)
 
-% Smith, 1982, Perception and Psychophysics
+%DPRIME = MAFC_P_TO_DPRIME(P, M)
+%   Calculates DPRIME value from proportion correct P and number of possible
+%   alernatives M in an M-alternative-forced-choise experiment.
+%
+%   From Hacker and Ratcliff, 1979, Perception and Psychophysics and 
+%   Smith, 1982, Perception and Psychophysics.
+%
+%   See also MAFC_DPRIME_TO_P
+
+% E. Gaudrain <egaudrain@gmail.com> - 2014-06-20
+% University of Groningen - University Medical Center Groningen
+% Department of Otorhinolaryngology, Groningen, NL
+
+
 
 if p==0
     dprime = -Inf;

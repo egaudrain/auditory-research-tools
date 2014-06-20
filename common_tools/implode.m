@@ -1,10 +1,12 @@
 function str = implode(glue, c, do_trim)
 
 %IMPLODE(GLUE, CELLARRAY) - Joins items of an array with glue
-%   str = IMPLODE(GLUE, C)
+%   STR = IMPLODE(GLUE, C)
 %       Produces a string with concatenated items of C separated with GLUE.
-%   str = IMPLODE(GLUE, C, 1)
+%   STR = IMPLODE(GLUE, C, true)
 %       Removes the empty cells.
+%
+%   See also EXPLODE
 
 
 %--------------------------------------------------------------------------

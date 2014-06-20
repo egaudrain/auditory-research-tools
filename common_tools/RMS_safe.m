@@ -9,23 +9,22 @@ function Out = RMS_safe(In,fs,Band,target_fs)
 %
 %       If IN is a filename, the file is opened using WAVREAD. FS is
 %       overriden by the result of WAVREAD.
-%
-%   AUTHOR
-%       Et. Gaudrain (egaudrain@olfac.univ-lyon1.fr),
+
+%   Author:
+%       Et. Gaudrain (egaudrain@olfac.univ-lyon1.fr), 2007-04-16,
 %       Laboratoire Neurosciences Sensorielles, Comportement, Cognition
 %       CNRS UMR 5020, 50 av. Tony Garnier, 69366 LYON Cedex 07, France
 
-% First released on 2007-04-16.
 
 if isstr(In)
-    [In fs] = wavread(In);
+    [In, fs] = wavread(In);
 end
 
 if fs~=target_fs
     In = resample(In, target_fs, fs);
 end
 
-[b a] = butter(4, Band/target_fs * 2);
+[b, a] = butter(4, Band/target_fs * 2);
 In = filter(b, a, In);
 In = filter(b, a, In(end:-1:1));
 In = In(end:-1:1);

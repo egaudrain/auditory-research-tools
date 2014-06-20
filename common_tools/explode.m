@@ -1,9 +1,12 @@
-function table=explode(sep, str)
-%EXPLODE - Coupe une chaine en segments
-%   ARRAY = EXPLODE(SEPARATOR, STRING)
-%     Retourne un tableau de chaînes. Ce sont les sous-chaînes extraites de
-%     STRING, en utilisant le séparateur SEPARATOR.
+function array=explode(sep, str)
+%EXPLODE - Splits a string into a cell array.
+% ARRAY = EXPLODE(SEP, STR)
+%     Returns a cell-array of strings extracted from STR and separated by
+%     SEP. The separator is removed.
+%     
+%     This is similar to the PHP function explode.
 %
+%   See also IMPLODE
 
 %------------------------------------------------
 % Et. Gaudrain - 2006-03-31
@@ -16,6 +19,6 @@ rem = str;
 
 while ~isempty(rem)
     [token, rem] = strtok(rem, sep);
-    table{i} = token;
+    array{i} = token;
     i = i+1;
 end

@@ -11,17 +11,16 @@ function Out = RMS(In,weight,fs)
 %
 %   When IN is a vector, the RMS is always calculated along the greatest
 %   dimension because sounds are supposed to be long vectors.
-%
-%   AUTHOR
+
+%   Authors:
 %       N. Grimault (ngrimault@olfac.univ-lyon1.fr),
 %       Et. Gaudrain (egaudrain@olfac.univ-lyon1.fr),
 %       Laboratoire de Neurosciences et Systèmes Sensoriels,
 %       UMR-CNRS 5020, 50 av. Tony Garnier, 69366 LYON Cedex 07, France
 %	
-%		Patch by Samuel Garcia sgarcia@olfac.univ-lyon1.fr
-%		for the weighting
-
-% Correction by Et. Gaudrain - 2007-02-19
+%	Changes:
+%       - Samuel Garcia sgarcia@olfac.univ-lyon1.fr for the weighting
+%       - Correction by Et. Gaudrain - 2007-02-19
 
 if nargin < 2
 	weight = 'flat';

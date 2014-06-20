@@ -1,4 +1,4 @@
-function [x fs] = generate_melody(arg1,arg2,arg3,arg4,arg5)
+function [x, fs] = generate_melody(arg1,arg2,arg3,arg4,arg5)
 
 % GENERATE_MELODY - Builds a sound signal from a melody
 %   [x fs] = generate_melody(str,fs,callback)
@@ -28,12 +28,12 @@ function [x fs] = generate_melody(arg1,arg2,arg3,arg4,arg5)
 
 %--------------------------------------------------------------------------
 % Etienne Gaudrain (egaudrain@olfac.univ-lyon1.fr) - 2007-07-18
-% CNRS, Universitï¿½ Lyon 1 - UMR 5020
+% CNRS, Université Lyon 1 - UMR 5020
 % $Revision: 1.2 $ $Date: 2007-07-18 13:38:54 $
 %--------------------------------------------------------------------------
 
 if nargin==3 % str,fs,callback
-    [notes durations] = parse_melody(arg1);
+    [notes, durations] = parse_melody(arg1);
     fs = arg2;
     callback = arg3;
     params = [];
@@ -45,7 +45,7 @@ elseif nargin==4
         callback = arg4;
         params = [];
     else            % str,fs,callback,params
-        [notes durations] = parse_melody(arg1);
+        [notes, durations] = parse_melody(arg1);
         fs = arg2;
         callback = arg3;
         params = arg4;

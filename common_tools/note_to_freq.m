@@ -9,7 +9,7 @@ function freq = note_to_freq(notes)
 
 %--------------------------------------------------------------------------
 % Etienne Gaudrain (egaudrain@olfac.univ-lyon1.fr) - 2007-07-17
-% CNRS, Universitï¿½ Lyon 1 - UMR 5020
+% CNRS, Université Lyon 1 - UMR 5020
 % $Revision: 1.1 $ $Date: 2007-07-18 12:33:49 $
 %--------------------------------------------------------------------------
 
@@ -27,12 +27,12 @@ alter.('e') = 0;
 a4_frequency = 440;
 c0_frequency = a4_frequency * 2^(-57/12);
 
-freq = [];
+freq = zeros(1, length(notes));
 for i=1:length(notes)
     note = regexp(notes{i},'([a-gA-G])([#b]?)([0-9]+)','tokens');
     
     if length(note)<1
-        freq = [freq -1];
+        freq(i) = -1;
         continue
     else
         note = note{1};
@@ -41,7 +41,7 @@ for i=1:length(notes)
         elseif strcmp(note{2},'#')==1
             note{2} = 'd';
         end
-        freq = [freq c0_frequency*2^((semitones.(lower(note{1})) + alter.(note{2}) + str2num(note{3})*12)/12)];
+        freq(i) = c0_frequency*2^((semitones.(lower(note{1})) + alter.(note{2}) + str2double(note{3})*12)/12);
     end
 end
     

@@ -26,7 +26,7 @@ end
 
 disp(['Dir : ' directory '/*.wav']);
 
-filelist = dir([directory '/*.wav']);
+filelist = dir(fullfile(directory, '*.wav'));
 
 for i=1:length(filelist)
     [x, fs] = wavread([directory '/' filelist(i).name]); 
