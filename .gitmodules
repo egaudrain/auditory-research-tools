@@ -1,0 +1,3 @@
+[submodule "vocoder_2013"]
+	path = vocoder_2013
+	url = https://github.com/egaudrain/vocoder.git
