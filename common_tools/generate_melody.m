@@ -75,7 +75,7 @@ sounds = {};
 ii = 0;
 for i=1:length(ix)
     if notes(ix(i))==-1
-        sounds{i} = zeros(1,floor(fs*durations(ix(i))));
+        sounds{i} = zeros(floor(fs*durations(ix(i))), 1);
     else
         ii = ii + 1;
         params.callnumber = ii;
@@ -84,9 +84,25 @@ for i=1:length(ix)
 end
 
 % Melody construction
+%{
+% EG, 2015-09-29
 x = [];
 for i=1:length(jx)
     s = sounds{jx(i)};
     x = [x ; s(:)];
+end
+%}
+
+% Calculate total duration
+d = 0;
+for i=1:length(durations)
+    d = d+durations(i);
+end
+x = zeros(round((d+1)*fs),1);
+k = 1;
+for i=1:length(jx)
+    s = sounds{jx(i)};
+    x(k:k+length(s)-1) = x(k:k+length(s)-1) + s;
+    k = round(sum(durations(1:i))*fs);
 end
 
