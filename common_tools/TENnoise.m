@@ -20,8 +20,8 @@ f = [f(1:n/2); f(n/2:-1:1)];
 X = X ./ ERBNwidth(f).^.5 .* elc(f);
 X(f<25) = 0;
 
-semilogx(f(1:n/2), 20*log10(abs(X(1:n/2))))
-xlim([50, 15000])
+%semilogx(f(1:n/2), 20*log10(abs(X(1:n/2))))
+%xlim([50, 15000])
 
 x = ifft(X, 'symmetric');
 
