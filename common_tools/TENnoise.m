@@ -8,6 +8,11 @@ function [x, fs] = TENnoise(d, fs)
 %     Moore, Huss, Vickers, Glasberg, Alcantara, (2000)
 %         "A test for the diagnosis of dead regions in the cochlea."
 %         Br. J. Audiol. 34, 205-224.
+%
+% IMPORTANT NOTE: This code does not seem to exactly follow the logic of
+% Moore et al. (2000) and seems to include some headphones-specific spectral
+% shaping, whitout specifying the headphones make and model. Double check that
+% this is doing what you are expecting, but it most probably isn't.
 
 
 n = 2*floor(d/2*fs);
