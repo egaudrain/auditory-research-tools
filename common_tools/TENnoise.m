@@ -19,7 +19,7 @@ function [x, fs] = TENnoise(d, fs, variant)
 %     Moore, Huss, Vickers, Glasberg, Alcantara, (2000)
 %         "A test for the diagnosis of dead regions in the cochlea."
 %         Br. J. Audiol. 34, 205-224.
-%     Moore, Glasber, Baer, (1997)
+%     Moore, Glasberg, Baer, (1997)
 %         "A model for the prediction of thresholds, loudness, and partial
 %         loudness." J. Audio Eng. Soc. 45(4), 224-240.
 %
