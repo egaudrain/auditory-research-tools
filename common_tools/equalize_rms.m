@@ -64,8 +64,7 @@ for k=1:length(lst)
     %fprintf("Reading %s...\n", fname);
     [x, ~] = audioread(fname);
     x = .98 * x/max(abs(x), [], "all");
-    lst(k).rms = rms(x, "all");
-    RMSs = [RMSs, lst(k).rms];
+    RMSs = [RMSs, rms(x, "all")];
 end
 
 RMS_ref = min(RMSs);
@@ -73,10 +72,10 @@ RMS_ref = min(RMSs);
 fprintf("Scanned %d files. The target RMS will be %.3f\n\n", length(lst), RMS_ref);
 
 for k=1:length(lst)
-    fname = fullfile(lst(k).folder, lst(k).name);
+    fname = convertCharsToStrings(fullfile(lst(k).folder, lst(k).name));
     [x, fs] = audioread(fname);
     
-    x = x / lst(k).rms * RMS_ref;
+    x = x / rms(x, "all") * RMS_ref;
     
     if save_inplace
         if ~use_original_extension
@@ -90,6 +89,9 @@ for k=1:length(lst)
         if ~use_original_extension
             fname_ext = target_format;
         end
+
+        fname_ext = convertCharsToStrings(fname_ext);
+        fname_name = convertCharsToStrings(fname_name);
         
         target_fname = fullfile(target_folder, fname_name + fname_ext);
     end
